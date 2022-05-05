@@ -2,12 +2,22 @@
 #![no_main]
 #![feature(core_intrinsics)]
 #![feature(lang_items)]
+#![feature(custom_test_frameworks)]
+
+mod vga_buffer;
 
 use core::fmt;
 use core::panic::PanicInfo;
 use core::fmt::Write;
 
 use x86_64::instructions::hlt;
+
+#[cfg(test)]
+fn test_runner(tests: &[&dyn Fn()]) {
+    for test in tests {
+        test();
+    }
+}
 
 #[allow(unused)]
 #[derive(Clone, Copy)]
@@ -91,16 +101,7 @@ pub extern "C" fn eh_personality() {}
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    panic!("panic happen");
-
-    let text = b"Rust in Action";
-
-    let mut cursor = Cursor {
-        position: 0,
-        foreground: Color::BrightCyan,
-        background: Color::Black,
-    };
-    cursor.print(text);
+    vga_buffer::print_something();
 
     loop {
         hlt();
