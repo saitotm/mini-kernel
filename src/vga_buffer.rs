@@ -1,4 +1,7 @@
-use core::{fmt::{self, Write}, panic::PanicInfo};
+use core::{
+    fmt::{self, Write},
+    panic::PanicInfo,
+};
 
 use volatile::Volatile;
 
@@ -97,13 +100,19 @@ impl Writer {
         self.column_position = 0;
     }
 
-    fn clear_row(&mut self, row: usize) { 
+    fn clear_row(&mut self, row: usize) {
         let blank = ScreenChar {
             ascii_character: b' ',
             color_code: self.color_code,
         };
         for col in 0..BUFFER_WIDTH {
             self.buffer.chars[row][col].write(blank);
+        }
+    }
+
+    fn clear(&mut self) {
+        for row in 0..BUFFER_HEIGHT {
+            self.clear_row(row);
         }
     }
 }
@@ -124,7 +133,7 @@ pub fn print_something() {
 
     writer.write_byte(b'H');
     writer.write_string("ello ");
-    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
+    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
 }
 
 pub fn print_panic(info: &PanicInfo) {
@@ -134,9 +143,7 @@ pub fn print_panic(info: &PanicInfo) {
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    for _ in 0..(80*25) {
-        writer.write_byte(b' ');
-    }
+    writer.clear();
 
     writer.column_position = 0;
     write!(writer, "{}", info).unwrap();
