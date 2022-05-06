@@ -1,4 +1,4 @@
-use core::fmt::{self, Write};
+use core::{fmt::{self, Write}, panic::PanicInfo};
 
 use volatile::Volatile;
 
@@ -125,4 +125,19 @@ pub fn print_something() {
     writer.write_byte(b'H');
     writer.write_string("ello ");
     write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
+}
+
+pub fn print_panic(info: &PanicInfo) {
+    let mut writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::White, Color::Blue),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    };
+
+    for _ in 0..(80*25) {
+        writer.write_byte(b' ');
+    }
+
+    writer.column_position = 0;
+    write!(writer, "{}", info).unwrap();
 }
