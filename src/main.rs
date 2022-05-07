@@ -31,7 +31,7 @@ pub extern "C" fn eh_personality() {}
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    vga_buffer::print_something();
+    println!("hello world");
 
     loop {
         hlt();
