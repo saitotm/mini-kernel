@@ -135,12 +135,8 @@ impl fmt::Write for Writer {
 }
 
 pub fn print_panic(info: &PanicInfo) {
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::White, Color::Blue),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
-
+    let mut writer = WRITER.lock();
+    writer.color_code = ColorCode::new(Color::White, Color::Blue);
     writer.clear();
 
     writer.column_position = 0;
@@ -160,7 +156,6 @@ macro_rules! println {
 
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
-    use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
 }
 
